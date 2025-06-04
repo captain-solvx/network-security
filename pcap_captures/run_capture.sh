@@ -1,20 +1,23 @@
 #!/bin/bash
 #
 # run_capture.sh
-# Continuously rotate hourly PCAPs on eth0
+# Rotate hourly PCAPs on eth0 and store them under /home/chronos/user/network-security/pcap_captures
 
+# 1) Define the interface and output folder (use absolute paths)
 INTERFACE="eth0"
-USER_HOME="/home/chronos/user"
-OUTDIR="$USER_HOME/network-security/pcap_captures"
+OUTDIR="/home/chronos/user/network-security/pcap_captures"
 
-# Ensure the correct directory under your user’s home
+# 2) Ensure the output directory exists (with your user’s ownership)
 mkdir -p "$OUTDIR"
+chown chronos:chronos "$OUTDIR"
 
-# Run tcpdump as root, but write into your user’s folder
-# -G 3600       : rotate every 3600 seconds (1 hour)
-# -W 24         : keep a sliding window of 24 files
-# -w "$OUTDIR/%Y%m%d_%H.pcap": strftime pattern
-sudo tcpdump -i "$INTERFACE" \
-  -w "$OUTDIR/%Y%m%d_%H.pcap" \
+# 3) Run tcpdump under sudo, writing one file per hour, 24-hour retention
+#    -i eth0                              : capture on eth0
+#    -w /home/.../%Y%m%d_%H.pcap          : strftime timestamped filename
+#    -G 3600                              : rotate every 3600 seconds (1 hour)
+#    -W 24                                : keep the last 24 files (delete older)
+sudo /usr/sbin/tcpdump -i "$INTERFACE" \
+  -w "$OUTDIR"/"%Y%m%d_%H.pcap" \
   -G 3600 \
   -W 24
+
