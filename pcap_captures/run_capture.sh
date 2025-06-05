@@ -12,6 +12,6 @@ mkdir -p "$OUTDIR"
 
 # 3) Run tcpdump (no sudo here; the script itself is run under sudo)
 /usr/bin/tcpdump -i "$INTERFACE" \
-  -w "$OUTDIR"/"%Y%m%d_%H.pcap" \
-  -G 3600 \
+  -w "$OUTDIR"/"%Y%m%d_%H%M.pcap" \
+  -G 60 \
   -W 24
