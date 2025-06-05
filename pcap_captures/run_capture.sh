@@ -1,17 +1,17 @@
 #!/bin/bash
-#
-# run_capture.sh
-# Rotate hourly PCAPs on eth0, storing under /home/linux/network-security/pcap_captures
 
-# 1) Define interface and output directory
-INTERFACE="eth0"
-OUTDIR="/home/linux/network-security/pcap_captures"
+# Set up directory
+CAPTURE_DIR="./pcap_captures"
+mkdir -p "$CAPTURE_DIR"
+chmod 755 "$CAPTURE_DIR"
 
-# 2) Ensure the output directory exists
-mkdir -p "$OUTDIR"
+# Create a timestamped file name
+FILENAME="$CAPTURE_DIR/capture-$(date +%Y%m%d%H%M%S).pcap"
 
-# 3) Run tcpdump (no sudo here; the script itself is run under sudo)
-/usr/bin/tcpdump -i "$INTERFACE" \
-  -w "$OUTDIR"/"%Y%m%d_%H.pcap" \
-  -G 3660 \
-  -W 24
+# Run tcpdump with 60-second file rotation (test mode)
+# Replace -i any with your preferred interface if needed
+sudo tcpdump -i any -G 60 -W 1 -w "$FILENAME"
+
+# Fix ownership so Git and you can access the file
+sudo chown "$USER:$USER" "$FILENAME"
+chmod 644 "$FILENAME"
